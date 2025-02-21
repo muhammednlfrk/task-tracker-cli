@@ -1,5 +1,3 @@
-using System.Runtime.Serialization;
-
 namespace TaskTracker.Core;
 
 public sealed class TaskEntity

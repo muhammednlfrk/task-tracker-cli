@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using TaskTracker.Core;
+using TaskTracker.Core.Repository;
 
 namespace TaskTracker.CLI.Commands;
 

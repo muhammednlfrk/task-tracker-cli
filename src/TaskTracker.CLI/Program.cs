@@ -2,7 +2,7 @@
 using Spectre.Console.Cli;
 using TaskTracker.CLI.Commands;
 using TaskTracker.CLI.Infrastructure;
-using TaskTracker.Core;
+using TaskTracker.Core.Repository;
 
 namespace TaskTracker.CLI;
 

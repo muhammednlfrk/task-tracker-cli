@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace TaskTracker.Core;
+namespace TaskTracker.Core.Repository;
 
 public interface ITaskRepository : IDisposable
 {
