@@ -20,7 +20,7 @@ public class MarkCommand(ITaskRepository taskRepository) : AsyncCommand<MarkComm
             return 1;
         }
 
-        AnsiConsole.MarkupLine($"Task [bold]{task.Id}[/] marked as [bold]{task.Status.GetStringValue()}[/]");
+        AnsiConsole.MarkupLine($"Task [bold]{task.Id}[/] marked as [bold]{task.Status.GetStringValue()}[/] :oncoming_fist:");
         return 0;
     }
 }
@@ -29,10 +29,18 @@ public class MarkCommandSettings : CommandSettings
 {
     [Description("Id of the task to mark")]
     [CommandArgument(0, "[ID]")]
-    public int Id { get; set; }
+    public required string Id { get; set; }
 
     [Description("Status to mark the task as")]
-    [CommandArgument(1, "[status]")]
+    [CommandArgument(1, "[STATUS]")]
     [TypeConverter(typeof(TaskStatusEnumConverter))]
     public Core.TaskStatus Status { get; set; }
+
+    override public ValidationResult Validate()
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+            return ValidationResult.Error("ID is required");
+
+        return ValidationResult.Success();
+    }
 }

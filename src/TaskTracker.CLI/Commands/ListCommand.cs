@@ -18,7 +18,7 @@ public class ListCommand(ITaskRepository taskRepository) : AsyncCommand<ListComm
 
         if (tasks.Count == 0)
         {
-            AnsiConsole.MarkupLine("No tasks found");
+            AnsiConsole.MarkupLine("No tasks found :face_screaming_in_fear:");
             return 0;
         }
 
@@ -26,7 +26,7 @@ public class ListCommand(ITaskRepository taskRepository) : AsyncCommand<ListComm
         table.AddColumn("#");
         table.Columns[0].RightAligned();
         table.Columns[0].Padding(1, 1);
-        table.Columns[0].Width(3);
+        table.Columns[0].Width(settings.ListDetailed == true ? 32 : 10);
         table.AddColumn("STATUS");
         table.Columns[1].LeftAligned();
         table.Columns[1].PadLeft(1);
@@ -34,9 +34,24 @@ public class ListCommand(ITaskRepository taskRepository) : AsyncCommand<ListComm
         table.Columns[2].LeftAligned();
         table.Columns[2].PadLeft(1);
         foreach (TaskEntity entity in tasks)
-            table.AddRow(entity.Id.ToString(), entity.Status.GetStringValue(), entity.Title);
-        table.Border(TableBorder.AsciiDoubleHead);
+        {
+            if (settings.ListDetailed == true)
+            {
+                table.AddRow(
+                entity.Id,
+                entity.Status.GetStringValue(),
+                entity.Title);
+            }
+            else
+            {
+                table.AddRow(
+                    entity.Id[..10],
+                    entity.Status.GetStringValue(),
+                    entity.Title);
+            }
+        }
         table.Collapse();
+        table.Border(TableBorder.AsciiDoubleHead);
         AnsiConsole.Write(table);
 
         return 0;
@@ -46,7 +61,11 @@ public class ListCommand(ITaskRepository taskRepository) : AsyncCommand<ListComm
 public class ListCommandSettings : CommandSettings
 {
     [Description("Status of the task (optional) [todo | done | in-progress]")]
-    [CommandArgument(0, "[status]")]
+    [CommandArgument(0, "[STATUS]")]
     [TypeConverter(typeof(TaskStatusEnumConverter))]
     public Core.TaskStatus? Status { get; set; } = null;
+
+    [Description("Lists detailed information")]
+    [CommandOption("-d|--detailed")]
+    public bool? ListDetailed { get; set; } = false;
 }

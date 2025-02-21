@@ -19,7 +19,7 @@ public class AddCommand(ITaskRepository taskRepository) : AsyncCommand<AddComman
             AnsiConsole.MarkupLine("[red]Error:[/] Unable to add task");
             return 1;
         }
-        AnsiConsole.MarkupLine($":call_me_hand: Task added successfully ID: {addedTask.Id}");
+        AnsiConsole.MarkupLine($"Task added successfully :call_me_hand: ID: {addedTask.Id}");
         return 0;
     }
 }

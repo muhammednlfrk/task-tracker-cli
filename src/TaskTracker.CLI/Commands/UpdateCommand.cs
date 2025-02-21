@@ -21,7 +21,7 @@ public class UpdateCommand(ITaskRepository? taskRepository) : AsyncCommand<Updat
             return 1;
         }
 
-        AnsiConsole.MarkupLine($"Task updated successfully");
+        AnsiConsole.MarkupLine($"Task updated successfully :person_raising_hand:");
         AnsiConsole.MarkupLine($"ID: [bold]{updatedTask.Id}[/]");
         AnsiConsole.MarkupLine($"Status: {updatedTask.Status}");
         AnsiConsole.MarkupLine($"Title: {updatedTask.Title}");
@@ -33,16 +33,16 @@ public class UpdateCommandSettings : CommandSettings
 {
     [Description("ID of the task to update")]
     [CommandArgument(0, "[ID]")]
-    public int Id { get; set; }
+    public required string Id { get; set; }
 
     [Description("New title of the task")]
-    [CommandArgument(1, "[Title]")]
+    [CommandArgument(1, "[TITLE]")]
     public string? Title { get; set; }
 
     public override ValidationResult Validate()
     {
-        if (Id < 0)
-            return ValidationResult.Error("ID must be a positive number");
+        if (string.IsNullOrWhiteSpace(Id))
+            return ValidationResult.Error("ID is required");
 
         if (string.IsNullOrWhiteSpace(Title))
             return ValidationResult.Error("Title must not be empty");

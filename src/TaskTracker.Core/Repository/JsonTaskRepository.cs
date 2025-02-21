@@ -9,24 +9,37 @@ public class JsonTaskRepository : ITaskRepository
     private const string TEMP_FILE_NAME = ".tasks.temp.json";
 
     private readonly string _jsonFile;
-    private readonly string _tempfile;
+    private readonly string _tempFile;
     private readonly Encoding _jsonEncoding;
     private List<TaskEntity> _tasks;
-    private int _nextId;
 
     public JsonTaskRepository(string workingFolder)
     {
         _tasks = [];
 
         _jsonFile = Path.Combine(workingFolder, JSON_FILE_NAME);
-        _tempfile = Path.Combine(workingFolder, TEMP_FILE_NAME);
+        _tempFile = Path.Combine(workingFolder, TEMP_FILE_NAME);
         _jsonEncoding = Encoding.Unicode;
 
+        checkForTempFile();
         openOrCreateJsonFile();
-        _nextId = _tasks.Count == 0 ? 1 : _tasks.Max(x => x.Id) + 1;
     }
 
     #region Private Methods
+
+    private void checkForTempFile()
+    {
+        FileInfo tempFileInfo = new(_tempFile);
+        if (tempFileInfo.Exists)
+        {
+            if (tempFileInfo.Length > 0)
+            {
+                File.Replace(_tempFile, _jsonFile, null);
+            }
+
+            File.Delete(_tempFile);
+        }
+    }
 
     private void openOrCreateJsonFile()
     {
@@ -57,8 +70,8 @@ public class JsonTaskRepository : ITaskRepository
         string json = JsonSerializer.Serialize(_tasks);
         byte[] bytes = _jsonEncoding.GetBytes(json);
 
-        await File.WriteAllBytesAsync(_tempfile, bytes);
-        File.Replace(_tempfile, _jsonFile, null);
+        await File.WriteAllBytesAsync(_tempFile, bytes);
+        File.Replace(_tempFile, _jsonFile, null);
     }
 
     #endregion
@@ -79,10 +92,11 @@ public class JsonTaskRepository : ITaskRepository
                           .ToList());
     }
 
-    public Task<TaskEntity?> FindAsync(int id)
+    public Task<TaskEntity?> FindAsync(string id)
     {
-        if (id < 1) return Task.FromResult<TaskEntity?>(null);
-        TaskEntity? result = _tasks.FirstOrDefault(x => x.Id == id && x.Status != TaskStatus.Deleted);
+        if (string.IsNullOrEmpty(id)) return Task.FromResult<TaskEntity?>(null);
+        TaskEntity? result = _tasks.FirstOrDefault(
+            x => (x.Id == id || x.Id[..10] == id) && x.Status != TaskStatus.Deleted);
         return Task.FromResult(result);
     }
 
@@ -90,17 +104,16 @@ public class JsonTaskRepository : ITaskRepository
     {
         TaskEntity taskToAdd = new()
         {
-            Id = _nextId,
+            Id = Guid.NewGuid().ToString().Replace("-", string.Empty),
             Title = title,
             Status = TaskStatus.Todo
         };
         _tasks.Add(taskToAdd);
-        _nextId++;
         await saveChangesAsync();
         return taskToAdd;
     }
 
-    public async Task<TaskEntity?> UpdateAsync(int id, string title)
+    public async Task<TaskEntity?> UpdateAsync(string id, string title)
     {
         TaskEntity? taskToUpdate = await FindAsync(id);
         if (taskToUpdate == null) return null;
@@ -109,7 +122,7 @@ public class JsonTaskRepository : ITaskRepository
         return taskToUpdate;
     }
 
-    public async Task<bool?> DeleteAsync(int id)
+    public async Task<bool?> DeleteAsync(string id)
     {
         TaskEntity? taskToRemove = await FindAsync(id);
         if (taskToRemove == null) return null;
@@ -118,7 +131,7 @@ public class JsonTaskRepository : ITaskRepository
         return true;
     }
 
-    public async Task<TaskEntity?> MarkAsAsync(int id, TaskStatus status)
+    public async Task<TaskEntity?> MarkAsAsync(string id, TaskStatus status)
     {
         if (status < TaskStatus.Todo || status > TaskStatus.Deleted) return null;
         TaskEntity? taskToUpdate = await FindAsync(id);
@@ -134,7 +147,7 @@ public class JsonTaskRepository : ITaskRepository
 
     public void Dispose()
     {
-        File.Delete(_tempfile);
+        File.Delete(_tempFile);
         _tasks.Clear();
         _tasks = null!;
         GC.SuppressFinalize(this);
