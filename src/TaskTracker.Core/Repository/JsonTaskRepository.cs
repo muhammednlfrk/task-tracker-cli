@@ -61,13 +61,17 @@ public class JsonTaskRepository : ITaskRepository
         }
         else
         {
-            _tasks = JsonSerializer.Deserialize<List<TaskEntity>>(json) ?? [];
+            _tasks = JsonSerializer.Deserialize<List<TaskEntity>>(
+                json: json,
+                jsonTypeInfo: JsonSerializationContext.Default.ListTaskEntity) ?? [];
         }
     }
 
     private async Task saveChangesAsync()
     {
-        string json = JsonSerializer.Serialize(_tasks);
+        string json = JsonSerializer.Serialize(
+            value: _tasks,
+            jsonTypeInfo: JsonSerializationContext.Default.ListTaskEntity);
         byte[] bytes = _jsonEncoding.GetBytes(json);
 
         await File.WriteAllBytesAsync(_tempFile, bytes);
