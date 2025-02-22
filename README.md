@@ -47,7 +47,6 @@ tasks can take `todo`, `in-progress` and `done` status. It can also take hidden 
 - `ttracker mark <task-id> todo`: Marks a task as "To Do".
 - `ttracker mark <task-id> in-progress`: Marks a task as "In Progress".
 - `ttracker mark <task-id> done`: Marks a task as "Done".
-- `ttracker mark <task-id> deleted`: Marks a task as "Deleted" (this status hides the task from the list).
 
 ## License
 
