@@ -1,0 +1,17 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="AppComponents" Directory="INSTALLFOLDER">
+      <Component>
+        <File Source="..\..\publish\win-x64\ttracker.exe" />
+      </Component>
+      <Component Id="EnvironmentComponent" Guid="df8b1397-c56f-4176-8d35-5fd8d3544553">
+        <Environment Id="AddToPath"
+                     Name="PATH"
+                     Value="[INSTALLFOLDER]"
+                     Action="set"
+                     Part="last"
+                     System="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
